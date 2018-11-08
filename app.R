@@ -104,9 +104,11 @@ ui <- fluidPage(
         selectizeInput("orgs",
                        "Select organization",
                        choices = organization,
-                       multiple = TRUE)
-
-
+                       multiple = TRUE),
+       
+         checkboxInput("QCfilter",
+                      label = "Filter out QC data",
+                      value = TRUE)
 
 
         ),
@@ -257,6 +259,26 @@ server <- function(input, output) {
        }
        
        qry <- paste0(qry,"org = c(",organiz,") "  )
+       
+     }
+     
+#QC data
+     
+     if( !input$QCfilter) {
+       
+       if(length(input$startd) > 0 |
+          length(input$endd) > 0|
+          length(input$monlocs) > 0|
+          length(input$characteristics) > 0|
+          length(input$stat_basis) > 0|
+          length(input$projs) > 0|
+          length(input$samp_med) > 0|
+          length(input$huc8_nms) > 0|
+          length(input$orgs) > 0){
+         qry <- paste0(qry, ", ")
+       }
+       
+       qry <- paste0(qry,"filterQC = FALSE")  
        
      }
      
