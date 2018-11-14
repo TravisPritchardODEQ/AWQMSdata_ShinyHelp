@@ -2,17 +2,16 @@
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 #
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+
 
 print("Initial data queries may take a few minutes.")
 
 library(shiny)
 library(AWQMSdata)
 
-#Query out the valid values
+
+# Query out the valiid values ---------------------------------------------
+
 chars <- AWQMS_Chars()
 chars <- chars$Char_Name
 chars <- sort(chars)
@@ -62,28 +61,33 @@ ui <- fluidPage(
    # Sidebar with parameter inputs
    sidebarLayout(
       sidebarPanel(
+        # Start Date
         dateInput("startd",
                   label = "Select Start Date",
                   min = '1949-09-15',
                   value = '1949-09-15'
                   ),
 
+        # End date
         dateInput("endd",
                   label = "Select End Date",
                   min = '1900-1-1'),
 
-        selectizeInput("characteristics",
+       #characteristics
+         selectizeInput("characteristics",
                      "Select parameters",
                      choices = chars,
                      multiple = TRUE),
 
-         selectizeInput("monlocs",
+       # Monitoring locations 
+        selectizeInput("monlocs",
                         "Select Monitoring Locations",
                         choices = station,
                         multiple = TRUE),
 
 
-        selectizeInput("projs",
+       # Projects 
+       selectizeInput("projs",
                        "Select Projects",
                        choices = projects,
                        multiple = TRUE),
@@ -93,22 +97,27 @@ ui <- fluidPage(
                        choices = stat_b,
                        multiple = TRUE),
 
+       # Sample media
         selectizeInput("samp_med",
                        "Select Sample Media",
                        choices = samp_media,
                        multiple = TRUE),
 
-        selectizeInput("huc8_nms",
+       # huc8 names 
+       selectizeInput("huc8_nms",
                        "Select HUC 8",
                        choices = HUC8_Names,
                        multiple = TRUE),
         
-        selectizeInput("orgs",
+        
+       #Orgs
+       selectizeInput("orgs",
                        "Select organization",
                        choices = organization,
                        multiple = TRUE),
        
-         checkboxInput("QCfilter",
+       #QC filter 
+       checkboxInput("QCfilter",
                       label = "Filter out QC data",
                       value = TRUE)
 
@@ -116,9 +125,12 @@ ui <- fluidPage(
         ),
 
 
-      mainPanel(
+     # Setup main panel
+       mainPanel(
         h1("Text to paste into R script"),
+        # Add line
         tags$hr(),
+        #Add break
         tags$br(),
         textOutput("selected_chars")
    )
@@ -129,6 +141,7 @@ server <- function(input, output) {
 
    output$selected_chars <- renderText({
 
+     # Convert all field entries to strings of vectors - This allows their use in the query
      stats <- toString(sprintf("'%s'", input$monlocs))
      vals <- toString(sprintf("'%s'", input$characteristics))
      sbasis <- toString(sprintf("'%s'", input$stat_basis))
@@ -137,9 +150,16 @@ server <- function(input, output) {
      huc8s <- toString(sprintf("'%s'", input$huc8_nms))
      organiz <-  toString(sprintf("'%s'", input$orgs))
 
+     # Begin the query 
      qry <- "AWQMS_Data("
 
-   #Start date
+  
+  # Add parameters to query - 
+     #General format - If field is not blank, and fields above are not blank add a comma and the paramter
+        # If above fields are all blank, do not add the comma
+        # If field is empty, do notheing
+     
+  #Start date
       if(length(input$startd) > 0){
        qry <- paste0(qry, "startdate = '", input$startd,"'" )
      }
