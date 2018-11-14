@@ -7,6 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
+print("Initial data queries may take a few minutes.")
+
 library(shiny)
 library(AWQMSdata)
 
@@ -15,7 +17,7 @@ chars <- AWQMS_Chars()
 chars <- chars$Char_Name
 chars <- sort(chars)
 
-station <- AWQMS_Station()
+station <- AWQMS_Stations()
 station <- station$MLocID
 station <- sort(station)
 
