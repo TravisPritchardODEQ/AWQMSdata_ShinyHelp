@@ -127,7 +127,10 @@ ui <- fluidPage(
 
      # Setup main panel
        mainPanel(
-        h1("Text to paste into R script"),
+        h1("AWQMS_Data() Builder"),
+        h5("Select parameters on left to build data retrieval function"),
+        #tags$br(),
+        h5("Copy and paste function below into a different R session"),
         # Add line
         tags$hr(),
         #Add break
