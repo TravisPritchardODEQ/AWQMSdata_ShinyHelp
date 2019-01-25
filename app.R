@@ -4,7 +4,7 @@
 #
 
 
-print("Initial data queries may take a few minutes.")
+
 
 library(shiny)
 library(AWQMSdata)
@@ -12,22 +12,42 @@ library(AWQMSdata)
 
 # Query out the valiid values ---------------------------------------------
 
-chars <- AWQMS_Chars()
-chars <- chars$Char_Name
-chars <- sort(chars)
 
-station <- AWQMS_Stations()
-station <- station$MLocID
-station <- sort(station)
-
-projects <- AWQMS_Projects()
-projects <- projects$Project
-projects <- sort(projects)
-
-organization <- AWQMS_Orgs()
-organization <- organization$OrganizationID
-organization <- sort(organization)
-
+if (!file.exists("query_cache.RData") |
+    difftime(Sys.Date() , file.mtime("query_cache.RData") , units = c("days")) > 14) {
+  
+  if(!file.exists("query_cache.RData")){
+    print("No initial query cache found.")
+  } else {
+    print(paste("Initial data queries ran", ceiling(difftime(Sys.Date() , file.mtime("query_cache.RData") , units = c("days"))), "days ago."))
+  }
+  
+  
+  
+  print("Initial queires may take a few minutes ")
+  
+  chars <- AWQMS_Chars()
+  chars <- chars$Char_Name
+  chars <- sort(chars)
+  
+  station <- AWQMS_Stations()
+  station <- station$MLocID
+  station <- sort(station)
+  
+  projects <- AWQMS_Projects()
+  projects <- projects$Project
+  projects <- sort(projects)
+  
+  organization <- AWQMS_Orgs()
+  organization <- organization$OrganizationID
+  organization <- sort(organization)
+  
+  
+  save(chars, station, projects, organization, file = "query_cache.RData")
+} else {
+  load("query_cache.RData")
+  print(paste("Initial data queries ran", ceiling(difftime(Sys.Date() , file.mtime("query_cache.RData") , units = c("days"))), "days ago."))
+}
 
 stat_b <- c("30DADMean", "7DADM", "7DADmean", "7DADMin", "Delta", "Geometric Mean", "Maximum", "Mean",
             "Median", "Minimum", "MPN", "Standard", "Error", "Sum")
@@ -103,6 +123,9 @@ ui <- fluidPage(
                        choices = samp_media,
                        multiple = TRUE),
 
+       #add warning
+       tags$em("Warning: HUC8 may not include all stations"),
+       
        # huc8 names 
        selectizeInput("huc8_nms",
                        "Select HUC 8",
