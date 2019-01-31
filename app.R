@@ -139,10 +139,16 @@ ui <- fluidPage(
                        choices = organization,
                        multiple = TRUE),
        
-       #QC filter 
+       #standard codes filter 
        checkboxInput("QCfilter",
-                      label = "Filter out QC data",
-                      value = TRUE)
+                     label = "Filter out QC data",
+                     value = TRUE),
+       
+       
+       #QC filter 
+       checkboxInput("strdcodes",
+                      label = "Include standard codes?",
+                      value = FALSE)
 
 
         ),
@@ -310,9 +316,9 @@ server <- function(input, output) {
        
      }
      
-#QC data
+#standard codes
      
-     if( !input$QCfilter) {
+     if( input$strdcodes) {
        
        if(length(input$startd) > 0 |
           length(input$endd) > 0|
@@ -326,11 +332,30 @@ server <- function(input, output) {
          qry <- paste0(qry, ", ")
        }
        
-       qry <- paste0(qry,"filterQC = FALSE")  
+       qry <- paste0(qry,"crit_codes  = TRUE")  
        
      }
      
-
+#QC data
+     
+     if( !input$QCfilter) {
+       
+       if(length(input$startd) > 0 |
+          length(input$endd) > 0|
+          length(input$monlocs) > 0|
+          length(input$characteristics) > 0|
+          length(input$stat_basis) > 0|
+          length(input$projs) > 0|
+          length(input$samp_med) > 0|
+          length(input$huc8_nms) > 0|
+          length(input$orgs) > 0 |
+          input$strdcodes == TRUE){
+         qry <- paste0(qry, ", ")
+       }
+       
+       qry <- paste0(qry,"filterQC = FALSE")  
+       
+     }
      qry <- paste0(qry, ")")
      qry
 
